@@ -1,31 +1,30 @@
-﻿using Domain.Interfaces.Services;
-using Application.Resource;
+﻿using Application.Resource;
 using Domain.Entities;
 using Domain.Entities.Request;
 using Domain.Entities.Response;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
+using Domain.Interfaces.Services;
+using Entities.Request;
+using Infra.Data;
+using Infra.Mail;
 using Microsoft.Extensions.Options;
-using System.Data.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Infra.Mail;
-using Entities.Request;
-using IdentityUser = Microsoft.AspNetCore.Identity.IdentityUser;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
     public class IdentityService : IIdentityService
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<UserIdentity> _signInManager;
+        private readonly UserManager<UserIdentity> _userManager;
         private readonly JwtOptions _jwtOptions;
         private readonly IEnvioEmail _emailMessage;
 
-        public IdentityService(SignInManager<IdentityUser> signInManager,
-                               UserManager<IdentityUser> userManager,
+        public IdentityService(SignInManager<UserIdentity> signInManager,
+                               UserManager<UserIdentity> userManager,
                                IOptions<JwtOptions> jwtOptions,
                                IEnvioEmail emailMessage)
         {
@@ -37,10 +36,11 @@ namespace Application.Services
 
         public async Task<UsuarioCadastroResponse> CadastrarUsuario(UsuarioCadastroRequest usuarioCadastro)
         {
-            var identityUser = new IdentityUser
+            var identityUser = new UserIdentity
             {
-                UserName = usuarioCadastro.Nome,
+                UserName = usuarioCadastro.Email,
                 Email = usuarioCadastro.Email,
+                NomeCompleto = usuarioCadastro.Nome
             };
 
             var result = await _userManager.CreateAsync(identityUser, usuarioCadastro.Senha);
@@ -300,7 +300,7 @@ namespace Application.Services
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
-        private async Task<IList<Claim>> ObterClaims(IdentityUser user, bool adicionarClaimsUsuario)
+        private async Task<IList<Claim>> ObterClaims(UserIdentity user, bool adicionarClaimsUsuario)
         {
             var claims = new List<Claim>()
             {

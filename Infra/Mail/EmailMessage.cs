@@ -51,7 +51,7 @@ namespace Infra.Mail
                 email.Body = bodyBuilder.ToMessageBody();
 
                 smtpClient.Connect(smtpServer, smtopPort, SecureSocketOptions.StartTls);
-                smtpClient.Authenticate("tech.challenge23@gmail.com", "tpucziicygquxboc");
+                smtpClient.Authenticate("tech.challenge23@gmail.com", "qgflnkoghhhbjydg");
                 smtpClient.Send(email);
             }
             catch (SmtpCommandException ex)

@@ -7,7 +7,7 @@ namespace Application.Services.Handler
     {
         public static string Deploy(string idUsuario, string token, string resource)
         {
-            var uriBuilder = new UriBuilder("https", "localhost", 7097);
+            var uriBuilder = new UriBuilder("https", "localhost", 44300);
             uriBuilder.Path = resource;
             var query = HttpUtility.ParseQueryString(uriBuilder.Query);
             query["token"] = token;

@@ -1,12 +1,11 @@
 ﻿using Domain.Entities;
 using Infra.Data.Mappings;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infra.Data.Context
 {
-    public class DataContext : IdentityDbContext<IdentityUser>
+    public class DataContext : IdentityDbContext<UserIdentity>
     {
         public DataContext() { }
 

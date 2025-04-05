@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Entities.Request;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
+using Infra.Data;
 using Infra.Data.Context;
 using Infra.Data.Repositories;
 using Microsoft.AspNetCore.Http.Features;
@@ -30,7 +31,7 @@ namespace Api.Extensions
             services.Configure<BlobStorage>(blobStorageSection);
 
             // Identity
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<UserIdentity>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
