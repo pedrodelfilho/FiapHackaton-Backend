@@ -13,6 +13,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Application.Services
 {
@@ -40,7 +41,11 @@ namespace Application.Services
             {
                 UserName = usuarioCadastro.Email,
                 Email = usuarioCadastro.Email,
-                NomeCompleto = usuarioCadastro.Nome
+                NomeCompleto = usuarioCadastro.Nome,
+                Cpf = usuarioCadastro.Cpf,
+                Crm = usuarioCadastro.Crm,
+                DataNascimento = usuarioCadastro.DataNascimento,
+                IdEspecialidade = usuarioCadastro.IdEspecialidade
             };
 
             var result = await _userManager.CreateAsync(identityUser, usuarioCadastro.Senha);
@@ -48,6 +53,8 @@ namespace Application.Services
             if (result.Succeeded)
             {
                 var userFromDb = await _userManager.FindByNameAsync(identityUser.UserName);
+
+                await _userManager.AddToRoleAsync(userFromDb, "Paciente");
 
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(userFromDb);
 
@@ -165,11 +172,11 @@ namespace Application.Services
             return usuarioRecuperarSenhaResponse;
         }
 
-        public async Task<DesativarUsuarioResponse> DesativarUsuario(string id)
+        public async Task<DesativarUsuarioResponse> DesativarUsuario(string email)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.FindByEmailAsync(email);
 
-            var desativarUsuarioResponse = new DesativarUsuarioResponse();
+            var desativarUsuarioResponse = new DesativarUsuarioResponse(user != null);
 
             if (desativarUsuarioResponse.Sucesso)
             {
@@ -182,18 +189,36 @@ namespace Application.Services
             return desativarUsuarioResponse;
         }
 
-        public async Task<bool> AlterarPerfilUsuario(string idUsuario, string role)
+        public async Task<DesativarUsuarioResponse> AtivarUsuario(string email)
         {
-            var user = await _userManager.FindByIdAsync(idUsuario);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            user.LockoutEnd = null;
+            var result = await _userManager.UpdateAsync(user);
+
+            var desativarUsuarioResponse = new DesativarUsuarioResponse(result.Succeeded);
+
+            if (!desativarUsuarioResponse.Sucesso)
+                desativarUsuarioResponse.AdicionarErro(await TratarErroResponse(null, user.Email, null));
+
+            return desativarUsuarioResponse;
+        }
+
+        public async Task<bool> AlterarPerfilUsuario(string email, string role)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            foreach (var rol in currentRoles)
+                await _userManager.RemoveFromRoleAsync(user, rol);
             try
             {
                 switch (role)
                 {
-                    case Constants.Admin:
-                        await _userManager.AddToRoleAsync(user, Constants.Admin);
+                    case Constants.Administrador:
+                        await _userManager.AddToRoleAsync(user, Constants.Administrador);
                         break;
-                    case Constants.Atendente:
-                        await _userManager.AddToRoleAsync(user, Constants.Atendente);
+                    case Constants.Medico:
+                        await _userManager.AddToRoleAsync(user, Constants.Medico);
                         break;
                     case Constants.Paciente:
                         await _userManager.AddToRoleAsync(user, Constants.Paciente);
@@ -212,10 +237,34 @@ namespace Application.Services
         public async Task<ObterUsuariosResponse> ObterTodosUsuarios()
         {
             var users = await _userManager.Users.ToListAsync();
+            var listaGerenciarUsuarios = new List<GerenciarUsuario>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                listaGerenciarUsuarios.Add(new GerenciarUsuario
+                {
+                    Nome = user.NomeCompleto,
+                    Email = user.Email,
+                    Role = roles.FirstOrDefault(),
+                    Bloqueado = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now
+                });
+            }
             var obterTodosUsuariosResponse = new ObterUsuariosResponse(users != null)
             {
                 Message = "Busca por todos os usuários realizada com sucesso!",
-                Data = users ?? []
+                Data = listaGerenciarUsuarios
+            };
+
+            return obterTodosUsuariosResponse;
+        }
+
+        public async Task<ObterUsuariosResponse> ObterUsuario(string crmOuCpf)
+        {
+            var users = await _userManager.Users.FirstOrDefaultAsync(x => x.Crm == crmOuCpf || x.Cpf == crmOuCpf);
+            var obterTodosUsuariosResponse = new ObterUsuariosResponse(users != null)
+            {
+                Message = "Busca por usuário realizada com sucesso!",
+                Data = users
             };
 
             return obterTodosUsuariosResponse;
@@ -233,7 +282,8 @@ namespace Application.Services
                 return trocarSenhaResponse;
             }
 
-            var changePasswordResult = await _userManager.ChangePasswordAsync(user, trocarSenha.SenhaAntiga, trocarSenha.NovaSenha);
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, trocarSenha.SenhaAtual, trocarSenha.NovaSenha);
+            trocarSenhaResponse = new TrocarSenhaResponse(changePasswordResult.Succeeded);
             if (!changePasswordResult.Succeeded)
             {
                 string descricaoAmigavelErro = await TratarErroResponse(null, trocarSenha.Email, changePasswordResult);
@@ -302,13 +352,16 @@ namespace Application.Services
 
         private async Task<IList<Claim>> ObterClaims(UserIdentity user, bool adicionarClaimsUsuario)
         {
+            var agora = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Nbf, DateTime.Now.ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.Now.ToString())
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(JwtRegisteredClaimNames.Nbf, agora),
+                new(JwtRegisteredClaimNames.Iat, agora, ClaimValueTypes.Integer64),
+                new(ClaimTypes.Name, user.NomeCompleto),
+                new(ClaimTypes.Email, user.Email)
             };
 
             if (adicionarClaimsUsuario)
@@ -319,7 +372,7 @@ namespace Application.Services
                 claims.AddRange(userClaims);
 
                 foreach (var role in roles)
-                    claims.Add(new Claim("role", role));
+                    claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
             return claims;

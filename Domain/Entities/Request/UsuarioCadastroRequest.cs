@@ -15,6 +15,14 @@ namespace Entities.Request
         [Required(ErrorMessage = "O campo {0} é obrigatório")]
         [StringLength(50, ErrorMessage = "O campo {0} deve ter entre {2} e {1} caracteres", MinimumLength = 6)]
         public string Senha { get; set; }
-    }
 
+        [Required(ErrorMessage = "O campo {0} é obrigatório")]
+        public string Cpf { get; set; }
+
+        public string Crm { get; set; }
+
+        [Required(ErrorMessage = "O campo {0} é obrigatório")]
+        public DateTime DataNascimento { get; set; }
+        public long? IdEspecialidade { get; set; }
+    }
 }

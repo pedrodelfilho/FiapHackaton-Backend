@@ -2,9 +2,9 @@
 {
     public class Constants
     {
-        public const string Admin = nameof(Admin);
+        public const string Administrador = nameof(Administrador);
         public const string Paciente = nameof(Paciente);
-        public const string Atendente = nameof(Atendente);
+        public const string Medico = nameof(Medico);
         public const long SOLICITACAO_ATIVA = 1;
         public const long SOLICITACAO_AUTORIZADO = 2;
         public const long SOLICITACAO_NEGADO = 3;

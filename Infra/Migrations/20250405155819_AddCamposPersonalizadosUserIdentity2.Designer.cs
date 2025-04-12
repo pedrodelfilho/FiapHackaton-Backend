@@ -4,6 +4,7 @@ using Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250405155819_AddCamposPersonalizadosUserIdentity2")]
+    partial class AddCamposPersonalizadosUserIdentity2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,59 +71,6 @@ namespace Infra.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Convenio", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.DisponibilidadeMedico", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<bool>("Ativo")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<DateTime>("Data")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("HoraFim")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan>("HoraInicio")
-                        .HasColumnType("time");
-
-                    b.Property<string>("MedicoId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MedicoId");
-
-                    b.ToTable("DisponibilidadeMedico", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Especialidade", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("DsEspecialidade")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
-                        .HasColumnName("DsEspecialidade");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Especialidades", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.HistoricoAgendamento", b =>
@@ -299,7 +249,7 @@ namespace Infra.Migrations
                     b.ToTable("TiposExame", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.UserIdentity", b =>
+            modelBuilder.Entity("Infra.Data.UserIdentity", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -326,9 +276,6 @@ namespace Infra.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<long?>("IdEspecialidade")
-                        .HasColumnType("bigint");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -367,8 +314,6 @@ namespace Infra.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdEspecialidade");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -533,17 +478,6 @@ namespace Infra.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DisponibilidadeMedico", b =>
-                {
-                    b.HasOne("Domain.Entities.UserIdentity", "Medico")
-                        .WithMany("Disponibilidades")
-                        .HasForeignKey("MedicoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Medico");
-                });
-
             modelBuilder.Entity("Domain.Entities.HistoricoAgendamento", b =>
                 {
                     b.HasOne("Domain.Entities.SolicitacaoAgendamento", "Solicitacao")
@@ -616,16 +550,6 @@ namespace Infra.Migrations
                     b.Navigation("TiposExames");
                 });
 
-            modelBuilder.Entity("Domain.Entities.UserIdentity", b =>
-                {
-                    b.HasOne("Domain.Entities.Especialidade", "Especialidade")
-                        .WithMany()
-                        .HasForeignKey("IdEspecialidade")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Especialidade");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -637,7 +561,7 @@ namespace Infra.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.UserIdentity", null)
+                    b.HasOne("Infra.Data.UserIdentity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -646,7 +570,7 @@ namespace Infra.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.UserIdentity", null)
+                    b.HasOne("Infra.Data.UserIdentity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -661,7 +585,7 @@ namespace Infra.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.UserIdentity", null)
+                    b.HasOne("Infra.Data.UserIdentity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -670,7 +594,7 @@ namespace Infra.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Domain.Entities.UserIdentity", null)
+                    b.HasOne("Infra.Data.UserIdentity", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -682,11 +606,6 @@ namespace Infra.Migrations
                     b.Navigation("Agendamentos");
 
                     b.Navigation("Solicitacoes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.UserIdentity", b =>
-                {
-                    b.Navigation("Disponibilidades");
                 });
 #pragma warning restore 612, 618
         }

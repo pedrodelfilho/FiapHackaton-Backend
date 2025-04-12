@@ -11,10 +11,12 @@ namespace Domain.Interfaces.Services
         Task<bool> Logout();
         Task<UsuarioRecuperarSenhaResponse> EsqueciSenha(UsuarioRecuperarSenhaRequest usuarioRecuperarSenha);
         Task<ConfirmarEmailResponse> ConfirmarEmail(ConfirmarEmailRequest confirmarEmail);
-        Task<DesativarUsuarioResponse> DesativarUsuario(string id);
+        Task<DesativarUsuarioResponse> DesativarUsuario(string email);
+        Task<DesativarUsuarioResponse> AtivarUsuario(string email);
         Task<TrocarSenhaResponse> TrocarSenha(TrocarSenhaRequest trocarSenha);
         Task<ResetarSenhaResponse> ResetarSenha(ResetarSenhaRequest resetarSenha0);
         Task<ObterUsuariosResponse> ObterTodosUsuarios();
-        Task<bool> AlterarPerfilUsuario(string idUsuario, string role);
+        Task<ObterUsuariosResponse> ObterUsuario(string crmOuCpf);
+        Task<bool> AlterarPerfilUsuario(string email, string role);
     }
 }

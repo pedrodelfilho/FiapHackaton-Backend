@@ -1,5 +1,8 @@
 using Api.Extensions;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.IdentityModel.Logging;
+
+IdentityModelEventSource.ShowPII = true;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +22,16 @@ var app = builder.Build();
 app.UseProblemDetails();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+
 app.UseCors(builder => builder
     .SetIsOriginAllowed(orign => true)
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials());
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

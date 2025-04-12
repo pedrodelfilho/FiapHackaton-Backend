@@ -25,6 +25,8 @@ namespace Infra.Data.Context
         public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<TiposExame> TiposExames { get; set; }
         public virtual DbSet<SolicitacaoExame> SolicitacaoExames { get; set; }
+        public virtual DbSet<Especialidade> Especialidades { get; set; }
+        public virtual DbSet<DisponibilidadeMedico> DisponibilidadeMedicos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -36,6 +38,13 @@ namespace Infra.Data.Context
             builder.ApplyConfiguration(new StatusMap());
             builder.ApplyConfiguration(new TiposExameMap());
             builder.ApplyConfiguration(new SolicitacaoExameMap());
+            builder.ApplyConfiguration(new EspecialidadeMap());
+            builder.ApplyConfiguration(new DisponibilidadeMedicoMap());
+            builder.Entity<UserIdentity>()
+                   .HasOne(u => u.Especialidade)
+                   .WithMany()
+                   .HasForeignKey(u => u.IdEspecialidade)
+                   .OnDelete(DeleteBehavior.Restrict);
             base.OnModelCreating(builder);
         }
     }

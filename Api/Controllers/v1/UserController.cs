@@ -132,20 +132,49 @@ namespace Api.Controllers.v1
         /// <summary>
         /// Comando que desativa usuário
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="email"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(DesativarUsuarioResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = nameof(Constants.Admin))]
+        [Authorize(Roles = nameof(Constants.Administrador))]
         [HttpPut("desativarusuario")]
-        public async Task<ActionResult<DesativarUsuarioResponse>> DesativarUsuario(string id)
+        public async Task<ActionResult<DesativarUsuarioResponse>> DesativarUsuario(DesativarUsuarioRequest email)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var resultado = await _identityService.DesativarUsuario(id);
+            var resultado = await _identityService.DesativarUsuario(email.Email);
+            if (resultado.Sucesso)
+                return Ok(resultado);
+            else if (resultado.Erros.Count > 0)
+            {
+                var problemDetails = new CustomProblemDetails(HttpStatusCode.BadRequest, Request, errors: resultado.Erros);
+                return Unauthorized(problemDetails);
+            }
+
+            return Unauthorized();
+
+        }
+
+        /// <summary>
+        /// Comando que desativa usuário
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(DesativarUsuarioResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize(Roles = nameof(Constants.Administrador))]
+        [HttpPut("ativarusuario")]
+        public async Task<ActionResult<DesativarUsuarioResponse>> AtivarUsuario(DesativarUsuarioRequest email)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var resultado = await _identityService.AtivarUsuario(email.Email);
             if (resultado.Sucesso)
                 return Ok(resultado);
             else if (resultado.Erros.Count > 0)
@@ -167,14 +196,14 @@ namespace Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = nameof(Constants.Admin))]
+        [Authorize(Roles = nameof(Constants.Administrador))]
         [HttpPut("alterarfuncaousuario")]
         public async Task<ActionResult> AlterarPerfilUsuario(AlterarPerfilUsuarioRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var resultado = await _identityService.AlterarPerfilUsuario(model.Id, model.Role);
+            var resultado = await _identityService.AlterarPerfilUsuario(model.Email, model.Role);
 
             if (resultado)
                 return Ok(resultado);
@@ -191,8 +220,8 @@ namespace Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize]
-        [HttpPut("trocarsenha")]
+        [Authorize(Roles = "Paciente")]
+        [HttpPost("trocarsenha")]
         public async Task<ActionResult<TrocarSenhaResponse>> TrocarSenha(TrocarSenhaRequest trocarSenha)
         {
             if (!ModelState.IsValid)
@@ -267,7 +296,7 @@ namespace Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Policy = "AdminOrAtendente")]
+        [Authorize(Roles = "Administrador")]
         [HttpGet("obterusuarios")]
         public async Task<ActionResult<ObterUsuariosResponse>> ObterTodosUsuarios()
         {
@@ -280,6 +309,32 @@ namespace Api.Controllers.v1
             else if (resultado.Erros.Count > 0)
             {
                 var problemDetails = new CustomProblemDetails(HttpStatusCode.BadRequest, Request, errors: resultado.Erros);
+                return Unauthorized(problemDetails);
+            }
+
+            return Unauthorized();
+        }
+
+        /// <summary>
+        /// Comando para obter todos os usuários cadastrados 
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ObterUsuariosResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [HttpGet("obterusuario")]
+        public async Task<ActionResult<ObterUsuariosResponse>> ObterUsuario(string crmOuCpf)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var resultado = await _identityService.ObterUsuario(crmOuCpf);
+            if (resultado.Sucesso)
+                return Ok(resultado);
+            else if (resultado.Erros.Count > 0)
+            {
+                var problemDetails = new CustomProblemDetails(HttpStatusCode.BadRequest, crmOuCpf, errors: resultado.Erros);
                 return Unauthorized(problemDetails);
             }
 

@@ -10,6 +10,7 @@ using Infra.Data.Repositories;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Constants = Application.Resource.Constants;
 
 namespace Api.Extensions
@@ -35,15 +36,11 @@ namespace Api.Extensions
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
-
-            // Policies
-            services.AddAuthorization(options =>
+            using (var serviceProvider = services.BuildServiceProvider())
             {
-                options.AddPolicy("AdminOrAtendente", policy =>
-                {
-                    policy.RequireRole(Constants.Admin, Constants.Atendente);
-                });
-            });
+                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                CreateRoles(roleManager);
+            }
 
             // Definição do arquivo do request
             services.Configure<FormOptions>(options =>
@@ -68,6 +65,7 @@ namespace Api.Extensions
                 cfg.CreateMap<SolicitacaoAgendamentoRequest, SolicitacaoAgendamento>().ReverseMap();
                 cfg.CreateMap<SolicitacaoAgendamentoUpdateStatusRequest, SolicitacaoAgendamento>().ReverseMap();
                 cfg.CreateMap<AgendamentoRequest, Agendamento>().ReverseMap();
+                cfg.CreateMap<DisponibilidadeMedicoRequest, DisponibilidadeMedico>().ReverseMap();
             });
             services.AddSingleton(autoMapperConfig.CreateMapper());
 
@@ -79,6 +77,9 @@ namespace Api.Extensions
             services.AddScoped<IHistoricoAgendamentoRepository, HistoricoAgendamentoRepository>();
             services.AddScoped<ISolicitacaoExameRepository, SolicitacaoExameRepository>();
             services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
+            services.AddScoped<IEspecialidadeRepository, EspecialidadeRespository>();
+            services.AddScoped<IDisponibilidadeMedicoRepository, DisponibilidadeMedicoRepository>();
+
 
             // Services
             services.AddScoped<IIdentityService, IdentityService>();
@@ -90,8 +91,24 @@ namespace Api.Extensions
             services.AddScoped<ISolicitacaoExameService, SolicitacaoExameService>();
             services.AddScoped<IAgendamentoService, AgendamentoService>();
             services.AddScoped<IBlobStorageService, BlobStorageService>();
+            services.AddScoped<IMedicoService, MedicoService>();
 
             return services;
         }
+
+        private static void CreateRoles(RoleManager<IdentityRole> roleManager)
+        {
+            string[] roleNames = { "Paciente", "Medico", "Administrador" };
+
+            foreach (var roleName in roleNames)
+            {
+                var roleExists = roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult();
+                if (!roleExists)
+                {
+                    roleManager.CreateAsync(new IdentityRole(roleName)).GetAwaiter().GetResult();
+                }
+            }
+        }
+
     }
 }

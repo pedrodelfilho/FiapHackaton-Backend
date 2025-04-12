@@ -2,6 +2,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
 namespace Api.Extensions
@@ -19,8 +20,16 @@ namespace Api.Extensions
         /// <returns></returns>
         public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+
             var jwtAppSettingOptions = configuration.GetSection(nameof(JwtOptions));
-            var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration.GetSection("JwtOptions:SecurityKey").Value));
+            var keyString = configuration.GetSection("JwtOptions:SecurityKey").Value;
+            var keyBytes = Encoding.ASCII.GetBytes(keyString);
+            Console.WriteLine($"Key length (bytes): {keyBytes.Length}"); // Deve imprimir 64
+
+            var securityKey = new SymmetricSecurityKey(keyBytes);
+
 
             services.Configure<JwtOptions>(options =>
             {
@@ -62,10 +71,22 @@ namespace Api.Extensions
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options => 
-            {
-                options.TokenValidationParameters = tokenValidationParameters;
-            });
+            })
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = tokenValidationParameters;
+                        options.TokenValidationParameters.RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnAuthenticationFailed = context =>
+                            {
+                                Console.WriteLine("Token inválido: " + context.Exception.Message);
+                                return Task.CompletedTask;
+                            }
+                        };
+                    });
+
 
             return services;
         }

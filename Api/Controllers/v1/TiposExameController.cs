@@ -77,7 +77,7 @@ namespace TechChallenge.Api.Controllers.v1
         [ProducesResponseType(typeof(ActionResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = nameof(Constants.Admin))]
+        [Authorize(Roles = nameof(Constants.Administrador))]
         [HttpDelete("remover")]
         public async Task<ActionResult> RemoverTiposExame(long id)
         {
