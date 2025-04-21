@@ -17,6 +17,7 @@ builder.Services.ResolveLog();
 builder.Services.AddAuthentication(builder.Configuration);
 builder.Services.RegisterServices(builder.Configuration);
 
+
 var app = builder.Build();
 
 app.UseProblemDetails();

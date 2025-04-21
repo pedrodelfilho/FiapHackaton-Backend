@@ -296,7 +296,7 @@ namespace Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = "Administrador")]
+        [Authorize]
         [HttpGet("obterusuarios")]
         public async Task<ActionResult<ObterUsuariosResponse>> ObterTodosUsuarios()
         {

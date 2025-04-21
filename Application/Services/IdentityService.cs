@@ -243,9 +243,11 @@ namespace Application.Services
                 var roles = await _userManager.GetRolesAsync(user);
                 listaGerenciarUsuarios.Add(new GerenciarUsuario
                 {
+                    Id = user.Id,
                     Nome = user.NomeCompleto,
                     Email = user.Email,
                     Role = roles.FirstOrDefault(),
+                    IdEspecialidade = user.IdEspecialidade,
                     Bloqueado = user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now
                 });
             }

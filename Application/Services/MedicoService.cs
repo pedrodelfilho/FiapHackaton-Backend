@@ -1,8 +1,10 @@
-﻿using Domain.Entities;
+﻿using Azure;
+using Domain.Entities;
 using Domain.Entities.Response;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services
 {
@@ -68,6 +70,30 @@ namespace Application.Services
             {
                 Data = disponibilidades
             };
+        }
+
+        public async Task<BaseResponse> ObterDisponibilidadeid(long idDisponibilidade)
+        {
+            var disponibilidades = await _disponibilidadeMedicoRepository.ObterDisponibilidade(idDisponibilidade);
+
+            return new BaseResponse(disponibilidades != null)
+            {
+                Data = disponibilidades
+            };
+        }
+
+        public async Task<BaseResponse> ObterMedicosPorEspecialidade(long idEspecialidade)
+        {
+            var todosUsuarios = _userManager.Users;
+            var usuariosDaEspecialidade = await todosUsuarios
+                            .Where(u => u.IdEspecialidade == idEspecialidade)
+                            .ToListAsync();
+
+            return new BaseResponse(true)
+            {
+                Data = usuariosDaEspecialidade
+            };
+
         }
 
         public async Task<BaseResponse> ObterTodasEspecialidades()

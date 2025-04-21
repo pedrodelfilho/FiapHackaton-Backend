@@ -4,6 +4,7 @@ using Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infra.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250415155835_MigrationsAgendamentoConsulta")]
+    partial class MigrationsAgendamentoConsulta
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,55 +24,6 @@ namespace Infra.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("Domain.Entities.Consulta", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("BIGINT");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("DataSolicitacao")
-                        .HasColumnType("DateTime")
-                        .HasColumnName("Data");
-
-                    b.Property<long>("IdDisponibilidade")
-                        .HasColumnType("bigint")
-                        .HasColumnName("IdDisponibilidade");
-
-                    b.Property<long>("IdStatus")
-                        .HasColumnType("bigint")
-                        .HasColumnName("IdStatus");
-
-                    b.Property<string>("IdUsuarioMedico")
-                        .IsRequired()
-                        .HasColumnType("NVARCHAR(450)")
-                        .HasColumnName("IdMedico");
-
-                    b.Property<string>("IdUsuarioPaciente")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("NVARCHAR(450)")
-                        .HasColumnName("IdPaciente");
-
-                    b.Property<long?>("StatusId")
-                        .HasColumnType("BIGINT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdDisponibilidade");
-
-                    b.HasIndex("IdStatus");
-
-                    b.HasIndex("IdUsuarioMedico");
-
-                    b.HasIndex("IdUsuarioPaciente");
-
-                    b.HasIndex("StatusId");
-
-                    b.ToTable("Consulta", (string)null);
-                });
 
             modelBuilder.Entity("Domain.Entities.DisponibilidadeMedico", b =>
                 {
@@ -124,6 +78,55 @@ namespace Infra.Migrations
                     b.ToTable("Especialidades", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.SolicitacaoAgendamento", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("BIGINT");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("DataSolicitacao")
+                        .HasColumnType("DateTime")
+                        .HasColumnName("Data");
+
+                    b.Property<long>("IdDisponibilidade")
+                        .HasColumnType("bigint")
+                        .HasColumnName("IdDisponibilidade");
+
+                    b.Property<long>("IdStatus")
+                        .HasColumnType("bigint")
+                        .HasColumnName("IdStatus");
+
+                    b.Property<string>("IdUsuarioMedico")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(450)")
+                        .HasColumnName("IdMedico");
+
+                    b.Property<string>("IdUsuarioPaciente")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("NVARCHAR(450)")
+                        .HasColumnName("IdPaciente");
+
+                    b.Property<long?>("StatusId")
+                        .HasColumnType("BIGINT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdDisponibilidade");
+
+                    b.HasIndex("IdStatus");
+
+                    b.HasIndex("IdUsuarioMedico");
+
+                    b.HasIndex("IdUsuarioPaciente");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("SolicitacaoAgendamento", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Status", b =>
                 {
                     b.Property<long>("Id")
@@ -165,7 +168,6 @@ namespace Infra.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -208,7 +210,6 @@ namespace Infra.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -237,7 +238,6 @@ namespace Infra.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -308,12 +308,10 @@ namespace Infra.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -350,12 +348,10 @@ namespace Infra.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -365,7 +361,18 @@ namespace Infra.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.Consulta", b =>
+            modelBuilder.Entity("Domain.Entities.DisponibilidadeMedico", b =>
+                {
+                    b.HasOne("Domain.Entities.UserIdentity", "Medico")
+                        .WithMany("Disponibilidades")
+                        .HasForeignKey("MedicoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Medico");
+                });
+
+            modelBuilder.Entity("Domain.Entities.SolicitacaoAgendamento", b =>
                 {
                     b.HasOne("Domain.Entities.DisponibilidadeMedico", "Disponibilidade")
                         .WithMany()
@@ -374,7 +381,7 @@ namespace Infra.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Status", null)
-                        .WithMany("Consultas")
+                        .WithMany("Solicitacoes")
                         .HasForeignKey("IdStatus")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -402,17 +409,6 @@ namespace Infra.Migrations
                     b.Navigation("UsuarioMedico");
 
                     b.Navigation("UsuarioPaciente");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DisponibilidadeMedico", b =>
-                {
-                    b.HasOne("Domain.Entities.UserIdentity", "Medico")
-                        .WithMany("Disponibilidades")
-                        .HasForeignKey("MedicoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Medico");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserIdentity", b =>
@@ -478,7 +474,7 @@ namespace Infra.Migrations
 
             modelBuilder.Entity("Domain.Entities.Status", b =>
                 {
-                    b.Navigation("Consultas");
+                    b.Navigation("Solicitacoes");
                 });
 
             modelBuilder.Entity("Domain.Entities.UserIdentity", b =>

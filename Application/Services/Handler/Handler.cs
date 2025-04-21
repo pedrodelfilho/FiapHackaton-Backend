@@ -16,26 +16,5 @@ namespace Application.Services.Handler
             var urlString = uriBuilder.ToString();
             return urlString;
         }
-        public static HistoricoAgendamento BuildHistoricoAgendamento(SolicitacaoAgendamento solicitacaoAgendamento)
-        {
-            return new HistoricoAgendamento
-            {
-                IdSolicitacao = solicitacaoAgendamento.Id,
-                IdStatus = solicitacaoAgendamento.IdStatus,
-                Data = DateTime.Now,
-                Atendente = solicitacaoAgendamento.Atendente
-            };
-        }
-
-        public static HistoricoAgendamento BuildHistoricoAgendamento(Agendamento agendamento, long idStatus)
-        {
-            return new HistoricoAgendamento
-            {
-                IdSolicitacao = agendamento.IdSolicitacao,
-                IdStatus = idStatus,
-                Data = DateTime.Now,
-                Atendente = agendamento.Atendente
-            };
-        }
     }
 }

@@ -16,18 +16,13 @@ namespace Infra.Data.Mappings
                 .UseIdentityColumn()
                 .HasColumnType("BIGINT");
 
-            builder.Property(x => x.Nome)
+            builder.Property(x => x.DsStatus)
                 .IsRequired()
                 .HasMaxLength(100)
-                .HasColumnName("Nome")
+                .HasColumnName("DsStatus")
                 .HasColumnType("VARCHAR(100)");
 
-            builder.HasMany(x => x.Agendamentos)
-            .WithOne(x => x.Status)
-            .HasForeignKey(x => x.IdStatus)
-            .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(x => x.Solicitacoes)
+            builder.HasMany(x => x.Consultas)
                 .WithOne()
                 .HasForeignKey(x => x.IdStatus)
                 .OnDelete(DeleteBehavior.Restrict);

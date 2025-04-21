@@ -51,7 +51,7 @@ namespace Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        [Authorize(Roles = nameof(Constants.Medico))]
+        [Authorize]
         [HttpGet("obterdisponibilidade")]
         public async Task<ActionResult<ObterUsuariosResponse>> ObterDisponibilidades(string email)
         {
@@ -115,6 +115,49 @@ namespace Api.Controllers.v1
             }
 
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+
+        /// <summary>
+        /// Comando para obter todos medicos por especialidades
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ObterUsuariosResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpGet("obtermedicoespecialidade")]
+        public async Task<ActionResult<ObterUsuariosResponse>> ObterMedicosPorEspecialidade(long idEspecialidade)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var resultado = await _medicoService.ObterMedicosPorEspecialidade(idEspecialidade);
+            if (resultado.Success)
+                return Ok(resultado);
+            return BadRequest();
+        }
+
+        /// <summary>
+        /// Comando para obter todas especialidades medicas
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ObterUsuariosResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [Authorize]
+        [HttpGet("obterdisponibilidadeid")]
+        public async Task<ActionResult<ObterUsuariosResponse>> ObterDisponibilidades(long idDisponibilidade)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var resultado = await _medicoService.ObterDisponibilidadeid(idDisponibilidade);
+            if (resultado.Success)
+                return Ok(resultado);
+            return BadRequest();
         }
     }
 }

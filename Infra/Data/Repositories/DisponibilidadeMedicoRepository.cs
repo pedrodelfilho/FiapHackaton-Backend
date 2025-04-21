@@ -11,10 +11,26 @@ namespace Infra.Data.Repositories
             return await base.Create(disponibilidade);
         }
 
+        public async Task AtualizarDisponibilidade(DisponibilidadeMedico disponibilidadeMedico)
+        {
+            await base.Update(disponibilidadeMedico);
+        }
+
         public async Task<List<DisponibilidadeMedico>> ObterDisponibilidade(string idMedico)
         {
             var result = await base.Get();
+            return result.Where(x => x.MedicoId == idMedico && x.Ativo).ToList();
+        }
+
+        public async Task<List<DisponibilidadeMedico>> ObterAllDisponibilidade(string idMedico)
+        {
+            var result = await base.Get();
             return result.Where(x => x.MedicoId == idMedico).ToList();
+        }
+
+        public async Task<DisponibilidadeMedico> ObterDisponibilidade(long idDisponibilidade)
+        {
+            return await base.Get(idDisponibilidade);
         }
 
         public async Task<List<DisponibilidadeMedico>> ObterPorMedicoEData(string medicoId, DateTime data)
