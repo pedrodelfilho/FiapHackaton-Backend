@@ -29,11 +29,6 @@ namespace Api.Extensions
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();
-            using (var serviceProvider = services.BuildServiceProvider())
-            {
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                CreateRoles(roleManager);
-            }
 
             // Definição do arquivo do request
             services.Configure<FormOptions>(options =>
@@ -69,19 +64,17 @@ namespace Api.Extensions
             return services;
         }
 
-        public static void CreateRoles(RoleManager<IdentityRole> roleManager)
+        public static async Task CreateRoles(RoleManager<IdentityRole> roleManager)
         {
             string[] roleNames = ["Paciente", "Medico", "Administrador"];
 
             foreach (var roleName in roleNames)
             {
-                var roleExists = roleManager.RoleExistsAsync(roleName).GetAwaiter().GetResult();
-                if (!roleExists)
+                if (!await roleManager.RoleExistsAsync(roleName))
                 {
-                    roleManager.CreateAsync(new IdentityRole(roleName)).GetAwaiter().GetResult();
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
                 }
             }
         }
-
     }
 }
