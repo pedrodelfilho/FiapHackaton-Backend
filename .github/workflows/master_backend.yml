@@ -21,19 +21,19 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Build API with dotnet
-        run: dotnet build ${{ github.workspace }}/Api/.Api.csproj --configuration Release
-      
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test ${{ github.workspace }}/Tests/Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+
       - name: dotnet publish
         run: dotnet publish ${{ github.workspace }}/Api/Api.csproj -c Release -o ${{ github.workspace }}/myapp
-      
-      - name: Run Unit Tests
-        run: dotnet test ${{ github.workspace }}/Tests/Tests.csproj --configuration Debug
-      
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: .net-api-app
+          name: .net-app
           path: ${{ github.workspace }}/myapp
 
   deploy:
