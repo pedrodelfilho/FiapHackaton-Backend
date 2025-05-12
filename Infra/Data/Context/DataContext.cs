@@ -16,9 +16,10 @@ namespace Infra.Data.Context
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("ConnectionString");
+                optionsBuilder.UseSqlServer("Data Source=tcp:pedro.database.windows.net,1433;Initial Catalog=FiapBd;Persist Security Info=False;User ID=pedro;Password=PE@cs@1910;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             }
         }
+
 
         public virtual DbSet<Especialidade> Especialidades { get; set; }
         public virtual DbSet<DisponibilidadeMedico> DisponibilidadeMedicos { get; set; }
