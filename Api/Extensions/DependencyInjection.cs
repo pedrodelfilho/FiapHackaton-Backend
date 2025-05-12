@@ -18,7 +18,7 @@ namespace Api.Extensions
         {
             // Connection strings
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("ConnectionString")));
+                options.UseSqlServer(configuration.GetConnectionString("BdPadraoConnection")));
 
             // JWT
             var jwtOptions = configuration.GetSection("JwtOptions");
